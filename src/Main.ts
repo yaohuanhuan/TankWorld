@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////////
-//
-//  Copyright (c) 2014-present, Egret Technology.
-//  All rights reserved.
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the Egret nor the
-//       names of its contributors may be used to endorse or promote products
-//       derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
-//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//////////////////////////////////////////////////////////////////////////////////////
 
 class Main extends eui.UILayer {
 
@@ -51,7 +23,6 @@ class Main extends eui.UILayer {
         egret.registerImplementation("eui.IAssetAdapter", assetAdapter);
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
 
-
         this.runGame().catch(e => {
             console.log(e);
         })
@@ -63,7 +34,7 @@ class Main extends eui.UILayer {
         const result = await RES.getResAsync("description_json")
         await platform.login();
         const userInfo = await platform.getUserInfo();
-    
+
 
     }
 
@@ -94,6 +65,8 @@ class Main extends eui.UILayer {
     }
 
     private textfield: egret.TextField;
+    private sprite: egret.Shape;
+    public x1: number;
     /**
      * 创建场景界面
      * Create scene interface
@@ -102,12 +75,22 @@ class Main extends eui.UILayer {
 
         let stageW = this.stage.stageWidth;
         let stageH = this.stage.stageHeight;
-       
+
         let shap: egret.Shape = new egret.Shape();
         shap.graphics.beginFill(0x1895FF, 0.5)
-        shap.graphics.drawRect(0,0,stageW,stageH);
+        shap.graphics.drawRect(0, 0, stageW, stageH);
         this.addChild(shap);
+        this.drawJoystick();
+        this.sprite = new egret.Shape();
 
+        this.addChild(this.sprite);
+
+        this.sprite.touchEnabled = true;
+        this.sprite.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
+        this.sprite.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
+        this.sprite.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+        this.sprite.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
+        this.sprite.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);
 
     }
     /**
@@ -120,5 +103,40 @@ class Main extends eui.UILayer {
         result.texture = texture;
         return result;
     }
+
+    private drawJoystick() {
+
+        var shp:egret.Shape = new egret.Shape();
+        shp.x = 100;
+        shp.y = 100;
+        shp.graphics.lineStyle( 10, 0x00ff00 );
+        shp.graphics.beginFill( 0xff0000, 1);
+        shp.graphics.drawCircle( 0, 0, 50 );
+        shp.graphics.endFill();
+        this.addChild( shp );
+    }
+
+   
+    private onTouchBegin(event: egret.TouchEvent): void {
+        egret.log(event.localX);
+    }
+
+    private onTouchEnd(): void {
+        egret.log("onTouchEnd");
+    }
+
+    private onTouchMove(): void {
+        egret.log("onTouchMove");
+    }
+
+    private onTouchTap(): void {
+        egret.log("onTouchTap");
+    }
+
+
+    private onEnterFrame(): void {
+        this.drawJoystick()
     
+    }
+
 }
