@@ -67,6 +67,7 @@ class Main extends eui.UILayer {
     private textfield: egret.TextField;
     private sprite: egret.Shape;
     public x1: number;
+    public y1: number;
     /**
      * 创建场景界面
      * Create scene interface
@@ -79,18 +80,22 @@ class Main extends eui.UILayer {
         let shap: egret.Shape = new egret.Shape();
         shap.graphics.beginFill(0x1895FF, 0.5)
         shap.graphics.drawRect(0, 0, stageW, stageH);
+        shap.touchEnabled = true;  
+
+        shap.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
+        shap.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
+        shap.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+        shap.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
+        shap.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);  
+
         this.addChild(shap);
-        this.drawJoystick();
+        
         this.sprite = new egret.Shape();
-
+        this.sprite.graphics.beginFill(0x000000, 1)
+        
+        
         this.addChild(this.sprite);
-
-        this.sprite.touchEnabled = true;
-        this.sprite.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-        this.sprite.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        this.sprite.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
-        this.sprite.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
-        this.sprite.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);
+        
 
     }
     /**
@@ -105,36 +110,35 @@ class Main extends eui.UILayer {
     }
 
     private drawJoystick() {
-
-        var shp:egret.Shape = new egret.Shape();
-        shp.x = 100;
-        shp.y = 100;
-        shp.graphics.lineStyle( 10, 0x00ff00 );
-        shp.graphics.beginFill( 0xff0000, 1);
-        shp.graphics.drawCircle( 0, 0, 50 );
-        shp.graphics.endFill();
-        this.addChild( shp );
+        this.sprite.graphics.clear();
+        this.sprite.graphics.beginFill(0x000000, 1)
+        this.sprite.graphics.drawRect(this.x1-50, this.y1-50, 100, 100);
+        this.sprite.graphics.endFill();
     }
 
    
     private onTouchBegin(event: egret.TouchEvent): void {
-        egret.log(event.localX);
+        this.x1 = event.localX;
+        this.y1 = event.localY;
     }
 
-    private onTouchEnd(): void {
+    private onTouchEnd(event: egret.TouchEvent): void {
         egret.log("onTouchEnd");
     }
 
-    private onTouchMove(): void {
-        egret.log("onTouchMove");
+    private onTouchMove(event: egret.TouchEvent): void {
+        this.x1 = event.localX;
+        this.y1 = event.localY;
     }
 
-    private onTouchTap(): void {
-        egret.log("onTouchTap");
+    private onTouchTap(event: egret.TouchEvent): void {
+        this.x1 = event.localX;
+        this.y1 = event.localY;
     }
 
 
     private onEnterFrame(): void {
+        // this.x1++;
         this.drawJoystick()
     
     }
