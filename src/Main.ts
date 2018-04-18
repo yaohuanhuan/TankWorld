@@ -24,7 +24,7 @@ class Main extends eui.UILayer {
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
 
         this.runGame().catch(e => {
-            console.log(e);
+            console.log(e); 
         })
     }
 
