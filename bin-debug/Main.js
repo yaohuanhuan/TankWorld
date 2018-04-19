@@ -46,7 +46,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.speed = 5;
+        _this.centerPoint = new egret.Point();
+        _this.fingerPoint = new egret.Point();
+        _this.a = 250;
+        _this.b = 250;
+        return _this;
     }
     Main.prototype.createChildren = function () {
         _super.prototype.createChildren.call(this);
@@ -150,6 +156,12 @@ var Main = (function (_super) {
         shapContainer.graphics.drawCircle(170, 900, 130);
         shapContainer.graphics.endFill();
         this.addChild(shapContainer);
+        //移动的物体
+        this.sprite = new egret.Shape();
+        this.sprite.graphics.beginFill(0xd20000, 1);
+        this.addChild(this.sprite);
+        this.centerPoint.x = 170;
+        this.centerPoint.y = 900;
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
@@ -169,15 +181,49 @@ var Main = (function (_super) {
     Main.prototype.drawJoystick = function () {
     };
     Main.prototype.onTouchBegin = function (event) {
+        this.fingerPoint.x = event.localX;
+        this.fingerPoint.y = event.localY;
     };
     Main.prototype.onTouchEnd = function (event) {
+        this.fingerPoint.x = this.centerPoint.x;
+        this.fingerPoint.y = this.centerPoint.y;
     };
     Main.prototype.onTouchMove = function (event) {
-        console.log(event.localX);
+        this.fingerPoint.x = event.localX;
+        this.fingerPoint.y = event.localY;
     };
     Main.prototype.onTouchTap = function (event) {
     };
     Main.prototype.onEnterFrame = function () {
+        var distance = egret.Point.distance(this.centerPoint, this.fingerPoint);
+        var distanceX = this.fingerPoint.x - this.centerPoint.x;
+        var distanceY = this.fingerPoint.y - this.centerPoint.y;
+        if (distanceX > 130 || distanceX < -130) {
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(this.a, this.b, 10);
+            this.sprite.graphics.endFill();
+            return;
+        }
+        if (distanceY > 130 || distanceY < -130) {
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(250, 250, 10);
+            this.sprite.graphics.endFill();
+            return;
+        }
+        if (distanceX == 0 && distanceY == 0) {
+        }
+        else {
+            var speedX = this.speed * distanceX / distance;
+            var speedY = this.speed * distanceY / distance;
+            this.a = this.a + speedX;
+            this.b = this.b + speedY;
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(this.a, this.b, 10);
+            this.sprite.graphics.endFill();
+        }
     };
     return Main;
 }(eui.UILayer));

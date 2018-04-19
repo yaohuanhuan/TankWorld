@@ -66,9 +66,10 @@ class Main extends eui.UILayer {
 
 
     private sprite: egret.Shape;
-    private speed: number = 10;
-    private fingerX: number;
-    private fingerY: number;
+    private speed: number = 5;
+
+    private centerPoint: egret.Point = new egret.Point();
+    private fingerPoint: egret.Point = new egret.Point();
 
 
     /**
@@ -82,17 +83,26 @@ class Main extends eui.UILayer {
         console.log(stageW);
         console.log(stageH);
 
-        let shap: egret.Shape = new egret.Shape();
-        shap.graphics.beginFill(0x1895FF, 0.5)
-        shap.graphics.drawRect(0, 0, stageW, stageH);
-        this.addChild(shap);
+        // let shap: egret.Shape = new egret.Shape();
+        // shap.graphics.beginFill(0x1895FF, 0.5)
+        // shap.graphics.drawRect(0, 0, stageW, stageH);
+        // this.addChild(shap);
 
         let shapContainer: egret.Shape = new egret.Shape();
         shapContainer.touchEnabled = true;
         shapContainer.graphics.beginFill(0xd20000, 1);
-        shapContainer.graphics.drawCircle(170, 900, 130);
+        shapContainer.graphics.drawCircle(170, 500, 130);
         shapContainer.graphics.endFill();
         this.addChild(shapContainer);
+
+        //移动的物体
+        this.sprite = new egret.Shape();
+
+        this.sprite.graphics.beginFill(0xd20000, 1);
+        this.addChild(this.sprite);
+
+        this.centerPoint.x = 170;
+        this.centerPoint.y = 500;
 
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
@@ -119,31 +129,65 @@ class Main extends eui.UILayer {
 
 
     private onTouchBegin(event: egret.TouchEvent): void {
-        this.fingerX = event.localX;
-        this.fingerY = event.localY;
+        this.fingerPoint.x = event.localX;
+        this.fingerPoint.y = event.localY;
     }
 
     private onTouchEnd(event: egret.TouchEvent): void {
-        this.fingerX = event.localX;
-        this.fingerY = event.localY;
+        this.fingerPoint.x = this.centerPoint.x;
+        this.fingerPoint.y = this.centerPoint.y;
     }
 
     private onTouchMove(event: egret.TouchEvent): void {
-        this.fingerX = event.localX;
-        this.fingerY = event.localY;
+        this.fingerPoint.x = event.localX;
+        this.fingerPoint.y = event.localY;
     }
 
     private onTouchTap(event: egret.TouchEvent): void {
 
     }
 
+    private a: number = 250;
+    private b: number = 250;
+
 
     private onEnterFrame(): void {
 
-        let distanceX: number = this.fingerX - 170;
-        let distanceY: number = this.fingerY - 900;
+        let distance: number = egret.Point.distance(this.centerPoint, this.fingerPoint);
+        let distanceX: number = this.fingerPoint.x - this.centerPoint.x;
+        let distanceY: number = this.fingerPoint.y - this.centerPoint.y;
 
-        let speedX: number = this.speed*
+        if(distanceX > 130 || distanceX < -130){
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(this.a, this.b, 10);
+            this.sprite.graphics.endFill();
+            return;
+        }
+        if(distanceY > 130 || distanceY < -130){
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(250, 250, 10);
+            this.sprite.graphics.endFill();
+            return;
+        }
+
+        if (distanceX == 0 && distanceY == 0) {
+
+        } else {
+            let speedX: number = this.speed * distanceX / distance;
+            let speedY: number = this.speed * distanceY / distance;
+
+            this.a = this.a + speedX;
+            this.b = this.b + speedY;
+            this.sprite.graphics.clear();
+            this.sprite.graphics.beginFill(0xd20000, 1);
+            this.sprite.graphics.drawCircle(this.a, this.b, 10);
+            this.sprite.graphics.endFill();
+        }
+
+
+
 
     }
 
