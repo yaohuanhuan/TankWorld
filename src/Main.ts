@@ -24,7 +24,7 @@ class Main extends eui.UILayer {
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter());
 
         this.runGame().catch(e => {
-            console.log(e); 
+            console.log(e);
         })
     }
 
@@ -64,38 +64,42 @@ class Main extends eui.UILayer {
         })
     }
 
-    private textfield: egret.TextField;
+
     private sprite: egret.Shape;
-    public x1: number;
-    public y1: number;
+    private speed: number = 10;
+    private fingerX: number;
+    private fingerY: number;
+
+
     /**
      * 创建场景界面
      * Create scene interface
      */
     protected createGameScene(): void {
 
-        let stageW = this.stage.stageWidth;
-        let stageH = this.stage.stageHeight;
+        let stageW = this.stage.stageWidth;     //640
+        let stageH = this.stage.stageHeight;    //1136
+        console.log(stageW);
+        console.log(stageH);
 
         let shap: egret.Shape = new egret.Shape();
         shap.graphics.beginFill(0x1895FF, 0.5)
         shap.graphics.drawRect(0, 0, stageW, stageH);
-        shap.touchEnabled = true;  
-
-        shap.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
-        shap.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
-        shap.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
-        shap.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
-        shap.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);  
-
         this.addChild(shap);
-        
-        this.sprite = new egret.Shape();
-        this.sprite.graphics.beginFill(0x000000, 1)
-        
-        
-        this.addChild(this.sprite);
-        
+
+        let shapContainer: egret.Shape = new egret.Shape();
+        shapContainer.touchEnabled = true;
+        shapContainer.graphics.beginFill(0xd20000, 1);
+        shapContainer.graphics.drawCircle(170, 900, 130);
+        shapContainer.graphics.endFill();
+        this.addChild(shapContainer);
+
+        shapContainer.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
+        shapContainer.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
+        shapContainer.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
+        shapContainer.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
+        shapContainer.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);
+
 
     }
     /**
@@ -110,37 +114,37 @@ class Main extends eui.UILayer {
     }
 
     private drawJoystick() {
-        this.sprite.graphics.clear();
-        this.sprite.graphics.beginFill(0x000000, 1)
-        this.sprite.graphics.drawRect(this.x1-50, this.y1-50, 100, 100);
-        this.sprite.graphics.endFill();
+
     }
 
-   
+
     private onTouchBegin(event: egret.TouchEvent): void {
-        this.x1 = event.localX;
-        this.y1 = event.localY;
+        this.fingerX = event.localX;
+        this.fingerY = event.localY;
     }
 
     private onTouchEnd(event: egret.TouchEvent): void {
-        egret.log("onTouchEnd");
+        this.fingerX = event.localX;
+        this.fingerY = event.localY;
     }
 
     private onTouchMove(event: egret.TouchEvent): void {
-        this.x1 = event.localX;
-        this.y1 = event.localY;
+        this.fingerX = event.localX;
+        this.fingerY = event.localY;
     }
 
     private onTouchTap(event: egret.TouchEvent): void {
-        this.x1 = event.localX;
-        this.y1 = event.localY;
+
     }
 
 
     private onEnterFrame(): void {
-        // this.x1++;
-        this.drawJoystick()
-    
+
+        let distanceX: number = this.fingerX - 170;
+        let distanceY: number = this.fingerY - 900;
+
+        let speedX: number = this.speed*
+
     }
 
 }
