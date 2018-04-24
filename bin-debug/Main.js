@@ -47,9 +47,15 @@ var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.speed = 5;
+        _this.speed = 3;
         _this.centerPoint = new egret.Point();
         _this.fingerPoint = new egret.Point();
+        //摇杆中心点坐标
+        _this.centerX = 180;
+        _this.centerY = 950;
+        _this.centerRadius = 130;
+        _this.time = 0;
+        _this.tempPoint = new egret.Point();
         _this.a = 250;
         _this.b = 250;
         return _this;
@@ -142,31 +148,29 @@ var Main = (function (_super) {
      * Create scene interface
      */
     Main.prototype.createGameScene = function () {
-        var stageW = this.stage.stageWidth; //640
-        var stageH = this.stage.stageHeight; //1136
-        console.log(stageW);
-        console.log(stageH);
-        var shap = new egret.Shape();
-        shap.graphics.beginFill(0x1895FF, 0.5);
-        shap.graphics.drawRect(0, 0, stageW, stageH);
-        this.addChild(shap);
+        var stageW = this.stage.stageWidth; //720
+        var stageH = this.stage.stageHeight; //1280
+        console.log("stageW == " + stageW + "||" + "stageH == " + stageH);
+        //创建虚拟摇杆容器
         var shapContainer = new egret.Shape();
         shapContainer.touchEnabled = true;
         shapContainer.graphics.beginFill(0xd20000, 1);
-        shapContainer.graphics.drawCircle(170, 900, 130);
+        shapContainer.graphics.drawCircle(this.centerX, this.centerY, this.centerRadius);
         shapContainer.graphics.endFill();
         this.addChild(shapContainer);
         //移动的物体
         this.sprite = new egret.Shape();
         this.sprite.graphics.beginFill(0xd20000, 1);
         this.addChild(this.sprite);
-        this.centerPoint.x = 170;
-        this.centerPoint.y = 900;
+        this.centerPoint.x = this.centerX;
+        this.centerPoint.y = this.centerY;
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnd, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMove, this);
         shapContainer.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
-        shapContainer.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);
+        // shapContainer.addEventListener(egret.TouchEvent.ENTER_FRAME, this.onEnterFrame, this);
+        this.time = egret.getTimer();
+        egret.startTick(this.onEnterFrame, this);
     };
     /**
      * 根据name关键字创建一个Bitmap对象。name属性请参考resources/resource.json配置文件的内容。
@@ -189,8 +193,17 @@ var Main = (function (_super) {
         this.fingerPoint.y = this.centerPoint.y;
     };
     Main.prototype.onTouchMove = function (event) {
-        this.fingerPoint.x = event.localX;
-        this.fingerPoint.y = event.localY;
+        this.tempPoint.x = event.localX;
+        this.tempPoint.y = event.localY;
+        var distance = egret.Point.distance(this.centerPoint, this.tempPoint);
+        if (distance < this.centerRadius - 10) {
+            this.fingerPoint.x = event.localX;
+            this.fingerPoint.y = event.localY;
+        }
+        else {
+            this.fingerPoint.x = this.centerPoint.x;
+            this.fingerPoint.y = this.centerPoint.y;
+        }
     };
     Main.prototype.onTouchTap = function (event) {
     };
@@ -198,19 +211,19 @@ var Main = (function (_super) {
         var distance = egret.Point.distance(this.centerPoint, this.fingerPoint);
         var distanceX = this.fingerPoint.x - this.centerPoint.x;
         var distanceY = this.fingerPoint.y - this.centerPoint.y;
-        if (distanceX > 130 || distanceX < -130) {
+        if (distanceX > this.centerRadius || distanceX < -this.centerRadius) {
             this.sprite.graphics.clear();
             this.sprite.graphics.beginFill(0xd20000, 1);
             this.sprite.graphics.drawCircle(this.a, this.b, 10);
             this.sprite.graphics.endFill();
-            return;
+            return false;
         }
-        if (distanceY > 130 || distanceY < -130) {
+        if (distanceY > this.centerRadius || distanceY < -this.centerRadius) {
             this.sprite.graphics.clear();
             this.sprite.graphics.beginFill(0xd20000, 1);
             this.sprite.graphics.drawCircle(250, 250, 10);
             this.sprite.graphics.endFill();
-            return;
+            return false;
         }
         if (distanceX == 0 && distanceY == 0) {
         }
@@ -223,7 +236,9 @@ var Main = (function (_super) {
             this.sprite.graphics.beginFill(0xd20000, 1);
             this.sprite.graphics.drawCircle(this.a, this.b, 10);
             this.sprite.graphics.endFill();
+            return true;
         }
+        return false;
     };
     return Main;
 }(eui.UILayer));
